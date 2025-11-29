@@ -1,0 +1,39 @@
+import jwt from "jsonwebtoken";
+import { addPromo } from "../../utils/db.js";
+
+export default function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ success: false, message: "Method not allowed" });
+  }
+
+  const { token, discount } = req.body || {};
+
+  // Cek token admin
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  // Generate kode promo
+  const code = "PROMO-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+  // Validasi discount dasar
+  const disc = discount || "10%";
+
+  // Tambahkan promo ke database
+  const result = addPromo(code, disc);
+
+  if (!result.success) {
+    return res.status(400).json({
+      success: false,
+      message: result.message
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Promo generated successfully!",
+    promo: { code, discount: disc }
+  });
+}
