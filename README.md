@@ -1,1 +1,1 @@
-# vanguard-shol
+# vanguard-shop
