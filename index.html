@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanguard Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: 38 92% 50%;
+            --background: 0 0% 100%;
+            --foreground: 0 0% 9%;
+            --card: 0 0% 98%;
+            --card-foreground: 0 0% 9%;
+            --secondary: 0 0% 90%;
+            --secondary-foreground: 0 0% 9%;
+            --muted: 0 0% 91%;
+            --muted-foreground: 0 0% 35%;
+            --accent: 35 15% 88%;
+            --accent-foreground: 0 0% 9%;
+            --destructive: 0 84% 48%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 0 0% 89%;
+            --input: 0 0% 89%;
+            --ring: 38 92% 50%;
+            --radius: 0.5rem;
+            --primary-hex: #F59E0B;
+            --background-hex: #FFFFFF;
+            --foreground-hex: #171717;
+            --card-hex: #F9F9F9;
+            --secondary-hex: #E5E5E5;
+            --muted-hex: #E7E7E7;
+            --muted-foreground-hex: #595959;
+            --accent-hex: #E8DFD5;
+            --destructive-hex: #EF4444;
+            --border-hex: #E2E2E2;
+            --input-hex: #E2E2E2;
+        }
+
+        [data-theme="dark"] {
+            --background: 0 0% 6%;
+            --foreground: 0 0% 96%;
+            --card: 0 0% 8%;
+            --card-foreground: 0 0% 96%;
+            --secondary: 0 0% 16%;
+            --secondary-foreground: 0 0% 96%;
+            --muted: 0 0% 15%;
+            --muted-foreground: 0 0% 65%;
+            --accent: 35 12% 18%;
+            --accent-foreground: 0 0% 96%;
+            --destructive: 0 84% 48%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 0 0% 16%;
+            --input: 0 0% 16%;
+            --ring: 38 92% 50%;
+            --background-hex: #0F0F0F;
+            --foreground-hex: #F5F5F5;
+            --card-hex: #141414;
+            --secondary-hex: #282828;
+            --muted-hex: #262626;
+            --muted-foreground-hex: #A6A6A6;
+            --accent-hex: #2A2420;
+            --border-hex: #292929;
+            --input-hex: #292929;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+        
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            line-height: 1.6;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header */
+        header {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            padding: 12px 0;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid hsl(var(--border));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: hsl(var(--primary));
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+        }
+        
+        nav ul li a {
+            color: hsl(var(--foreground));
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.3s;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+        }
+        
+        nav ul li a:hover {
+            color: hsl(var(--primary));
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: hsl(var(--foreground));
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+        }
+
+        .theme-toggle:hover {
+            background-color: hsl(var(--secondary));
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, hsl(var(--primary) / 0.9) 0%, hsl(25 95% 53% / 0.9) 50%, hsl(var(--primary) / 0.9) 100%), url('https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+            font-weight: 400;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .server-status {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: hsl(142 76% 36%);
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .hero-btn {
+            background: white;
+            color: hsl(var(--primary));
+            padding: 12px 25px;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .hero-btn:hover {
+            background: hsl(var(--primary));
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        
+        /* Produk Section */
+        .products {
+            padding: 60px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 36px;
+            color: hsl(var(--foreground));
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: hsl(var(--primary));
+            margin: 10px auto;
+            border-radius: var(--radius);
+        }
+
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-bar {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: hsl(var(--muted-foreground));
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 10px 20px;
+            background: hsl(var(--secondary));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .filter-tab.active {
+            background: hsl(var(--primary));
+            color: white;
+            border-color: hsl(var(--primary));
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: hsl(var(--accent));
+        }
+        
+        .category-title {
+            font-size: 28px;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid hsl(var(--primary));
+            color: hsl(var(--foreground));
+            font-weight: 700;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .category-subtitle {
+            font-size: 16px;
+            color: hsl(var(--muted-foreground));
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .product-card {
+            background: hsl(var(--card));
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid hsl(var(--border));
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: hsl(var(--card-foreground));
+            font-family: 'Cinzel', serif;
+        }
+        
+        .product-description {
+            color: hsl(var(--muted-foreground));
+            font-size: 14px;
+            margin-bottom: 15px;
+            min-height: 60px;
+            font-weight: 400;
+        }
+
+        .product-pricing {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: hsl(var(--primary));
+            font-family: 'Cinzel', serif;
+        }
+
+        .product-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            border-radius: var(--radius);
+            padding: 5px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: hsl(var(--primary));
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.3s;
+            width: 100%;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        
+        .btn:hover {
+            background-color: hsl(var(--primary) / 0.9);
+        }
+
+        .btn:disabled {
+            background-color: hsl(var(--muted-foreground));
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+        }
+
+        .btn-secondary:hover {
+            background-color: hsl(var(--secondary) / 0.8);
+        }
+
+        .btn-destructive {
+            background-color: hsl(var(--destructive));
+            color: hsl(var(--destructive-foreground));
+        }
+
+        .btn-destructive:hover {
+            background-color: hsl(var(--destructive) / 0.9);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: hsl(var(--primary));
+            border: 1px solid hsl(var(--primary));
+        }
+
+        .btn-outline:hover {
+            background-color: hsl(var(--primary));
+            color: white;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: hsl(var(--card));
+            color: hsl(var(--card-foreground));
+            padding: 40px 0 20px;
+            font-size: 14px;
+            border-top: 1px solid hsl(var(--border));
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: hsl(var(--primary));
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+        }
+        
+        .footer-section p, .footer-section ul {
+            font-size: 14px;
+            color: hsl(var(--muted-foreground));
+            font-weight: 400;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            color: hsl(var(--muted-foreground));
+            font-size: 20px;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: hsl(var(--primary));
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid hsl(var(--border));
+            font-size: 12px;
+            color: hsl(var(--muted-foreground));
+        }
+
+        /* Copy IP Button */
+        .copy-ip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: hsl(var(--primary));
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        /* Floating Buttons */
+        .floating-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 99;
+        }
+
+        .whatsapp-btn {
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .whatsapp-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Cart Icon */
+        .cart-icon {
+            width: 60px;
+            height: 60px;
+            background: hsl(var(--primary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            font-size: 20px;
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .cart-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: hsl(var(--destructive));
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Cart Container */
+        .cart-container {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100vh;
+            background: hsl(var(--background));
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            transition: right 0.3s;
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid hsl(var(--border));
+        }
+        
+        .cart-container.active {
+            right: 0;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        
+        .cart-title {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: hsl(var(--foreground));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+        }
+
+        .close-cart:hover {
+            background-color: hsl(var(--secondary));
+        }
+
+        .minimize-cart {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: hsl(var(--foreground));
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+        }
+
+        .minimize-cart:hover {
+            background-color: hsl(var(--secondary));
+        }
+        
+        .cart-items {
+            flex: 1;
+            margin-bottom: 20px;
+            overflow-y: auto;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+        
+        .cart-item-info h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+        
+        .cart-item-price {
+            font-weight: 600;
+            color: hsl(var(--primary));
+        }
+        
+        .remove-item {
+            background: none;
+            border: none;
+            color: hsl(var(--destructive));
+            cursor: pointer;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: var(--radius);
+        }
+
+        .remove-item:hover {
+            background-color: hsl(var(--destructive) / 0.1);
+        }
+
+        .clear-cart-btn {
+            background: none;
+            border: none;
+            color: hsl(var(--destructive));
+            cursor: pointer;
+            text-align: left;
+            padding: 5px 0;
+            font-size: 14px;
+            width: fit-content;
+            border-radius: var(--radius);
+            padding: 8px 12px;
+        }
+
+        .clear-cart-btn:hover {
+            background-color: hsl(var(--destructive) / 0.1);
+        }
+        
+        .cart-total {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 15px 0;
+            text-align: right;
+            font-family: 'Cinzel', serif;
+        }
+
+        .cart-form {
+            margin: 15px 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .color-option.selected {
+            border-color: hsl(var(--primary));
+        }
+
+        .color-red { background: #ef4444; }
+        .color-blue { background: #3b82f6; }
+        .color-gold { background: #D4AF37; }
+        .color-white { background: #f5f5f5; }
+        .color-purple { background: #8b5cf6; }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input {
+            margin-top: 3px;
+        }
+        
+        .promo-section {
+            margin: 15px 0;
+        }
+
+        .promo-input {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .promo-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius) 0 0 var(--radius);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+        
+        .promo-input button {
+            background: hsl(var(--primary));
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .remove-promo {
+            background: none;
+            border: none;
+            color: hsl(var(--destructive));
+            cursor: pointer;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: var(--radius);
+        }
+
+        .remove-promo:hover {
+            background-color: hsl(var(--destructive) / 0.1);
+        }
+        
+        .cart-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn-checkout {
+            background: hsl(var(--primary));
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        
+        .btn-clear {
+            background: hsl(var(--destructive));
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .checkout-timer {
+            text-align: center;
+            font-size: 12px;
+            color: hsl(var(--muted-foreground));
+            margin-top: 5px;
+        }
+
+        /* Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            animation: slideInRight 0.3s, fadeOut 0.3s 2.7s;
+            max-width: 300px;
+        }
+
+        .toast.success {
+            background: hsl(142 76% 36%);
+        }
+
+        .toast.error {
+            background: hsl(var(--destructive));
+        }
+
+        .toast.info {
+            background: hsl(221 83% 53%);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 60px 0;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 15px 20px;
+            background: hsl(var(--card));
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s, padding 0.3s;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 15px 20px;
+            max-height: 500px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container, .admin-container {
+            background: hsl(var(--background));
+            border-radius: var(--radius);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            position: relative;
+            border: 1px solid hsl(var(--border));
+        }
+
+        .admin-container {
+            max-width: 800px;
+        }
+
+        .login-title, .admin-title {
+            text-align: center;
+            margin-bottom: 10px;
+            color: hsl(var(--primary));
+            font-size: 32px;
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .admin-subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: hsl(var(--muted-foreground));
+            font-size: 20px;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+        }
+        
+        .admin-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: hsl(var(--card));
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .admin-section h3 {
+            margin-bottom: 15px;
+            color: hsl(var(--card-foreground));
+            font-size: 20px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+        }
+
+        .admin-logout {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .promo-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .promo-form select, .promo-form input {
+            padding: 10px;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .promo-output {
+            background: hsl(var(--secondary));
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .promo-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .promo-table th, .promo-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .promo-table th {
+            background: hsl(var(--secondary));
+            font-weight: 600;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: hsl(var(--muted-foreground));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+        }
+
+        .modal-close:hover {
+            background-color: hsl(var(--secondary));
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 15px;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 0 10px;
+            }
+            
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .cart-container {
+                width: 100%;
+                right: -100%;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .floating-buttons {
+                bottom: 10px;
+                right: 10px;
+            }
+
+            .promo-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">VANGUARD</div>
+                <nav>
+                    <ul>
+                        <li><a href="#beranda">Beranda</a></li>
+                        <li><a href="#produk">Produk</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#" id="adminLink">Admin</a></li>
+                        <li>
+                            <button class="theme-toggle" id="themeToggle">
+                                <i class="fas fa-moon"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="beranda">
+        <div class="container">
+            <h1>LIST VANGUARD SHOP</h1>
+            <p>Temukan koleksi lengkap item game RPG kami dengan pelayanan 24/7 dan checkout via WhatsApp.</p>
+            
+            <div class="server-status">
+                <div class="status-indicator"></div>
+                <span>Server Online - vgrdlgnz.my.id</span>
+            </div>
+            
+            <div class="hero-buttons">
+                <button class="hero-btn" id="viewProducts">Lihat Produk</button>
+                <button class="hero-btn" id="exploreBtn">Jelajahi</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Produk Section -->
+    <section class="products" id="produk">
+        <div class="container">
+            <h2 class="section-title">KATALOG PRODUK</h2>
+            
+            <div class="search-filter">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Cari produk...">
+                    <i class="fas fa-search"></i>
+                </div>
+                
+                <div class="filter-tabs">
+                    <div class="filter-tab active" data-category="all">Semua</div>
+                    <div class="filter-tab" data-category="kit">🔥 Kit P2W</div>
+                    <div class="filter-tab" data-category="skill">💎 Skill P2W</div>
+                    <div class="filter-tab" data-category="health">🛡️ Darah/Totem</div>
+                    <div class="filter-tab" data-category="rank">👑 Rank Donatur</div>
+                </div>
+            </div>
+            
+            <!-- Kit P2W -->
+            <h3 class="category-title">List P2W Kit 🔱</h3>
+            <p class="category-subtitle">Kit dengan perlengkapan tempur lengkap</p>
+            
+            <div class="product-grid" id="productGrid">
+                <!-- Products will be dynamically generated -->
+            </div>
+
+            <!-- Skill P2W -->
+            <h3 class="category-title">List P2W Skill 🔥</h3>
+            <p class="category-subtitle">Tingkatkan kemampuan karakter dengan skill khusus</p>
+            
+            <div class="product-grid" id="skillGrid">
+                <!-- Products will be dynamically generated -->
+            </div>
+
+            <!-- Darah/Totem -->
+            <h3 class="category-title">List P2W Darah + Totem ❤‍🔥</h3>
+            <p class="category-subtitle">Tingkatkan ketahanan dengan darah dan totem tambahan</p>
+            
+            <div class="product-grid" id="healthGrid">
+                <!-- Products will be dynamically generated -->
+            </div>
+
+            <!-- Rank Donatur -->
+            <h3 class="category-title">Rank Khusus</h3>
+            <p class="category-subtitle">Dapatkan rank donatur dengan donasi minimal 50k per bulan</p>
+            
+            <div class="product-grid" id="rankGrid">
+                <!-- Products will be dynamically generated -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section" id="faq">
+        <div class="container">
+            <h2 class="section-title">FAQ - Pertanyaan Umum</h2>
+            
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Bagaimana cara membeli produk?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Pilih produk yang ingin dibeli, tambahkan ke keranjang, isi data username dan warna, lalu checkout via WhatsApp.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Berapa lama proses pengiriman?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Proses pengiriman biasanya memakan waktu 5-15 menit setelah pembayaran dikonfirmasi.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Apakah ada garansi untuk produk?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Ya, semua produk memiliki garansi 7 hari. Jika ada masalah, hubungi admin via WhatsApp.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>INFORMASI</h3>
+                    <ul>
+                        <li>IP Server: vgrdlgnz.my.id</li>
+                        <li>Versi: 1.8 – 1.20</li>
+                        <li>Ping: 1-15 ms</li>
+                        <li>Support: 24/7</li>
+                    </ul>
+                    <button class="copy-ip" id="copyIpBtn">
+                        <i class="fas fa-copy"></i> Salin IP Server
+                    </button>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>TENTANG KAMI</h3>
+                    <p>Vanguard Shop menyediakan item game RPG terlengkap dengan pelayanan 24/7 dan checkout via WhatsApp.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>METODE PEMBAYARAN</h3>
+                    <p>Kami menerima pembayaran melalui transfer bank, e-wallet, dan pulsa.</p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>© 2025 Vanguard Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Buttons -->
+    <div class="floating-buttons">
+        <div class="whatsapp-btn" id="whatsappBtn">
+            <i class="fab fa-whatsapp"></i>
+        </div>
+        <div class="cart-icon" id="cartIcon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count">0</span>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-container" id="cartContainer">
+        <div class="cart-header">
+            <div>
+                <button class="minimize-cart" id="minimizeCart">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <h3 class="cart-title">Keranjang Belanja</h3>
+            </div>
+            <button class="close-cart" id="closeCart"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="cart-items" id="cartItems">
+            <!-- Items will be added here -->
+        </div>
+        
+        <button class="clear-cart-btn" id="clearCartBtn">Hapus Semua Item</button>
+        
+        <div class="cart-form">
+            <div class="form-group">
+                <label for="username">Username Minecraft</label>
+                <input type="text" id="username" class="form-control" placeholder="Masukkan username" minlength="3">
+                <div id="usernameError" style="color: hsl(var(--destructive)); font-size: 12px; margin-top: 5px;"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>Warna Username</label>
+                <div class="color-options">
+                    <div class="color-option color-red selected" data-color="Red"></div>
+                    <div class="color-option color-blue" data-color="Blue"></div>
+                    <div class="color-option color-gold" data-color="Gold"></div>
+                    <div class="color-option color-white" data-color="White"></div>
+                    <div class="color-option color-purple" data-color="Purple"></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Catatan Pembeli (Opsional)</label>
+                <textarea id="notes" class="form-control" rows="3" placeholder="Masukkan catatan khusus..."></textarea>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="agreement">
+                <label for="agreement">Saya setuju dengan aturan pembelian</label>
+            </div>
+        </div>
+        
+        <div class="promo-section">
+            <h4>Kode Promo</h4>
+            <div class="promo-input">
+                <input type="text" id="promoCode" placeholder="Masukkan kode promo (VG-XXXXXX)">
+                <button id="applyPromo">Terapkan</button>
+            </div>
+            <div id="promoMessage"></div>
+        </div>
+        
+        <div class="cart-total" id="cartTotal">
+            Total: RP 0
+        </div>
+        
+        <div class="cart-actions">
+            <button class="btn-checkout" id="checkoutBtn" disabled>
+                <i class="fab fa-whatsapp"></i> Checkout via WhatsApp
+            </button>
+            <div class="checkout-timer" id="checkoutTimer"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display: none;">
+        <div class="login-container">
+            <h2 class="login-title">ADMIN PANEL</h2>
+            <p style="text-align: center; margin-bottom: 20px; font-size: 14px; color: hsl(var(--muted-foreground));">Masuk untuk mengelola kode promo Vanguard shop</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" class="form-control" placeholder="Masukkan username admin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" class="form-control" placeholder="Masukkan password">
+                </div>
+                
+                <button type="submit" class="btn">Login</button>
+            </form>
+            
+            <button class="modal-close" id="closeLogin">×</button>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminPanel" class="modal" style="display: none;">
+        <div class="admin-container">
+            <div class="admin-logout">
+                <button class="btn btn-secondary" id="adminLogout">Logout</button>
+            </div>
+            
+            <h1 class="admin-title">VANGUARD</h1>
+            <h2 class="admin-subtitle">ADMIN PANEL</h2>
+            <h3 style="text-align: center; margin-bottom: 25px; color: hsl(var(--muted-foreground)); font-size: 16px;">Vanguard Shop</h3>
+            
+            <div class="admin-section">
+                <h3>GENERATE KODE PROMO</h3>
+                
+                <div class="promo-form">
+                    <select id="discountType">
+                        <option value="percentage">Percentage</option>
+                        <option value="fixed">Fixed Amount</option>
+                    </select>
+                    <input type="number" id="discountValue" placeholder="Nilai diskon" min="1">
+                    <button class="btn" id="generatePromoBtn">Generate Promo Code</button>
+                </div>
+                
+                <div class="promo-output" id="promoOutput" style="display: none;">
+                    <div>
+                        <strong id="promoCodeOutput"></strong>
+                        <div id="promoDetails"></div>
+                    </div>
+                    <button class="btn" id="copyPromoBtn">Salin</button>
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <h3>KODE PROMO AKTIF</h3>
+                
+                <table class="promo-table">
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th>Tipe</th>
+                            <th>Nilai</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promoList">
+                        <!-- Promo codes will be added here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <button class="modal-close" id="closeAdmin">×</button>
+        </div>
+    </div>
+
+    <script>
+        // Data untuk aplikasi (sesuai permintaan)
+        const products = [
+            // Kit P2W
+            { id: 1, name: "Kit Perintis", description: "Kit dasar untuk pemula.", price: 10000, category: "kit" },
+            { id: 2, name: "Kit Pewaris", description: "Kit menengah dengan perlengkapan lebih baik.", price: 20000, category: "kit" },
+            { id: 3, name: "Kit Sultan", description: "Kit lengkap dengan item terbaik.", price: 25000, category: "kit" },
+            
+            // Skill P2W
+            { id: 4, name: "1 Skill Max", description: "Maksimalkan 1 skill pilihan.", price: 15000, category: "skill" },
+            { id: 5, name: "All Skill Max", description: "Maksimalkan semua skill.", price: 150000, category: "skill" },
+            
+            // Darah/Totem
+            { id: 6, name: "1 Darah/Totem", description: "Tambahan 1 darah atau totem.", price: 10000, category: "health" },
+            
+            // Rank Donatur
+            { id: 7, name: "Rank Donatur", description: "Donasi minimal 50k per bulan. Dapatkan rank donatur dan kit khusus yang bisa diclaim 1 minggu sekali.", price: 50000, category: "rank" }
+        ];
+
+        let cart = [];
+        let appliedPromo = null;
+        let selectedColor = "Red";
+        let checkoutCooldown = false;
+        let adminToken = null;
+        let activePromos = [];
+
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const cartIcon = document.getElementById('cartIcon');
+        const cartContainer = document.getElementById('cartContainer');
+        const closeCart = document.getElementById('closeCart');
+        const minimizeCart = document.getElementById('minimizeCart');
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        const cartCount = document.querySelector('.cart-count');
+        const clearCartBtn = document.getElementById('clearCartBtn');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const checkoutTimer = document.getElementById('checkoutTimer');
+        const searchInput = document.getElementById('searchInput');
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        const productGrid = document.getElementById('productGrid');
+        const skillGrid = document.getElementById('skillGrid');
+        const healthGrid = document.getElementById('healthGrid');
+        const rankGrid = document.getElementById('rankGrid');
+        const applyPromoBtn = document.getElementById('applyPromo');
+        const promoCodeInput = document.getElementById('promoCode');
+        const promoMessage = document.getElementById('promoMessage');
+        const usernameInput = document.getElementById('username');
+        const usernameError = document.getElementById('usernameError');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const notesInput = document.getElementById('notes');
+        const agreementCheckbox = document.getElementById('agreement');
+        const copyIpBtn = document.getElementById('copyIpBtn');
+        const whatsappBtn = document.getElementById('whatsappBtn');
+        const viewProductsBtn = document.getElementById('viewProducts');
+        const exploreBtn = document.getElementById('exploreBtn');
+        const toastContainer = document.getElementById('toastContainer');
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        // Modal Elements
+        const adminLink = document.getElementById('adminLink');
+        const loginModal = document.getElementById('loginModal');
+        const closeLogin = document.getElementById('closeLogin');
+        const adminPanel = document.getElementById('adminPanel');
+        const closeAdmin = document.getElementById('closeAdmin');
+        const loginForm = document.getElementById('loginForm');
+        const adminLogout = document.getElementById('adminLogout');
+        const generatePromoBtn = document.getElementById('generatePromoBtn');
+        const discountType = document.getElementById('discountType');
+        const discountValue = document.getElementById('discountValue');
+        const promoOutput = document.getElementById('promoOutput');
+        const promoCodeOutput = document.getElementById('promoCodeOutput');
+        const promoDetails = document.getElementById('promoDetails');
+        const copyPromoBtn = document.getElementById('copyPromoBtn');
+        const promoList = document.getElementById('promoList');
+
+        // Backend API URLs - Menggunakan path relatif
+        const API_BASE = '/api';
+        const API_ENDPOINTS = {
+            LOGIN: `${API_BASE}/admin/login.js`,
+            LOGOUT: `${API_BASE}/admin/logout.js`,
+            GENERATE_PROMO: `${API_BASE}/admin/generate-promo.js`,
+            GET_PROMOS: `${API_BASE}/admin/promos.js`,
+            VALIDATE_PROMO: `${API_BASE}/validate-promo.js`
+        };
+
+        // Initialize the application
+        function init() {
+            // Load saved data from localStorage
+            loadFromLocalStorage();
+            
+            // Render products
+            renderProductsByCategory();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Update cart display
+            updateCart();
+        }
+
+        // Load data from localStorage
+        function loadFromLocalStorage() {
+            const savedCart = localStorage.getItem('vanguardCart');
+            const savedUsername = localStorage.getItem('vanguardUsername');
+            const savedColor = localStorage.getItem('vanguardColor');
+            const savedTheme = localStorage.getItem('vanguardTheme');
+            const savedToken = localStorage.getItem('vanguardAdminToken');
+            
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+            }
+            
+            if (savedUsername) {
+                usernameInput.value = savedUsername;
+            }
+            
+            if (savedColor) {
+                selectedColor = savedColor;
+                document.querySelector(`.color-option[data-color="${savedColor}"]`).classList.add('selected');
+            }
+            
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                updateThemeIcon(savedTheme);
+            }
+            
+            if (savedToken) {
+                adminToken = savedToken;
+            }
+        }
+
+        // Save data to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('vanguardCart', JSON.stringify(cart));
+            localStorage.setItem('vanguardUsername', usernameInput.value);
+            localStorage.setItem('vanguardColor', selectedColor);
+            if (adminToken) {
+                localStorage.setItem('vanguardAdminToken', adminToken);
+            }
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Theme toggle
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Cart functionality
+            cartIcon.addEventListener('click', toggleCart);
+            closeCart.addEventListener('click', closeCartContainer);
+            minimizeCart.addEventListener('click', minimizeCartContainer);
+            clearCartBtn.addEventListener('click', clearCart);
+            
+            // Checkout functionality
+            checkoutBtn.addEventListener('click', checkout);
+            usernameInput.addEventListener('input', validateForm);
+            agreementCheckbox.addEventListener('change', validateForm);
+            
+            // Color selection
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    colorOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    selectedColor = option.getAttribute('data-color');
+                    saveToLocalStorage();
+                });
+            });
+            
+            // Search and filter
+            searchInput.addEventListener('input', handleSearch);
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    filterTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    filterProducts(tab.getAttribute('data-category'));
+                });
+            });
+            
+            // Promo code
+            applyPromoBtn.addEventListener('click', applyPromoCode);
+            
+            // Copy IP
+            copyIpBtn.addEventListener('click', copyIP);
+            
+            // WhatsApp button
+            whatsappBtn.addEventListener('click', () => {
+                window.open('https://wa.me/6285929874084', '_blank');
+            });
+            
+            // Hero buttons
+            viewProductsBtn.addEventListener('click', () => {
+                document.getElementById('produk').scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            exploreBtn.addEventListener('click', () => {
+                document.getElementById('faq').scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // FAQ accordion
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    item.classList.toggle('active');
+                });
+            });
+            
+            // Admin functionality
+            adminLink.addEventListener('click', openLoginModal);
+            closeLogin.addEventListener('click', closeLoginModal);
+            closeAdmin.addEventListener('click', closeAdminPanel);
+            loginForm.addEventListener('submit', handleAdminLogin);
+            adminLogout.addEventListener('click', handleAdminLogout);
+            generatePromoBtn.addEventListener('click', generatePromoCode);
+            copyPromoBtn.addEventListener('click', copyPromoCode);
+            
+            // Form validation
+            usernameInput.addEventListener('input', validateForm);
+            
+            // Save data on changes
+            usernameInput.addEventListener('input', saveToLocalStorage);
+            notesInput.addEventListener('input', saveToLocalStorage);
+        }
+
+        // Theme functionality
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('vanguardTheme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = themeToggle.querySelector('i');
+            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Cart functionality
+        function toggleCart() {
+            cartContainer.classList.toggle('active');
+        }
+
+        function closeCartContainer() {
+            cartContainer.classList.remove('active');
+        }
+
+        function minimizeCartContainer() {
+            cartContainer.classList.remove('active');
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCart();
+            saveToLocalStorage();
+            showToast('Keranjang berhasil dikosongkan', 'success');
+        }
+
+        function addToCart(productId, quantity = 1) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: quantity
+                });
+            }
+            
+            updateCart();
+            saveToLocalStorage();
+            showToast(`${product.name} ditambahkan ke keranjang`, 'success');
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCart();
+            saveToLocalStorage();
+            showToast('Item dihapus dari keranjang', 'info');
+        }
+
+        function updateCart() {
+            cartItems.innerHTML = '';
+            let total = 0;
+            let itemCount = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                itemCount += item.quantity;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <p>RP ${item.price.toLocaleString('id-ID')}</p>
+                        <div class="cart-item-quantity">
+                            <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                        </div>
+                    </div>
+                    <div class="cart-item-price">
+                        RP ${itemTotal.toLocaleString('id-ID')}
+                        <button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                
+                cartItems.appendChild(cartItem);
+            });
+            
+            // Hitung diskon jika ada promo
+            let discount = 0;
+            if (appliedPromo) {
+                if (appliedPromo.type === 'percentage') {
+                    discount = total * (appliedPromo.value / 100);
+                } else {
+                    discount = appliedPromo.value;
+                }
+            }
+            
+            const finalTotal = total - discount;
+            
+            // Update total dan jumlah item
+            cartTotal.innerHTML = `
+                ${discount > 0 ? `<div>Subtotal: RP ${total.toLocaleString('id-ID')}</div>` : ''}
+                ${discount > 0 ? `<div>Diskon (${appliedPromo.code}): -RP ${discount.toLocaleString('id-ID')}</div>` : ''}
+                <div>TOTAL: RP ${finalTotal.toLocaleString('id-ID')}</div>
+            `;
+            
+            cartCount.textContent = itemCount;
+            
+            // Tambahkan event listener untuk tombol hapus dan quantity
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', () => {
+                    const itemId = parseInt(button.getAttribute('data-id'));
+                    removeFromCart(itemId);
+                });
+            });
+            
+            document.querySelectorAll('.quantity-btn.minus').forEach(button => {
+                button.addEventListener('click', () => {
+                    const itemId = parseInt(button.getAttribute('data-id'));
+                    const item = cart.find(item => item.id === itemId);
+                    if (item.quantity > 1) {
+                        item.quantity -= 1;
+                        updateCart();
+                        saveToLocalStorage();
+                    } else {
+                        removeFromCart(itemId);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.quantity-btn.plus').forEach(button => {
+                button.addEventListener('click', () => {
+                    const itemId = parseInt(button.getAttribute('data-id'));
+                    const item = cart.find(item => item.id === itemId);
+                    item.quantity += 1;
+                    updateCart();
+                    saveToLocalStorage();
+                });
+            });
+        }
+
+        // Product rendering by category
+        function renderProductsByCategory() {
+            // Clear all grids
+            productGrid.innerHTML = '';
+            skillGrid.innerHTML = '';
+            healthGrid.innerHTML = '';
+            rankGrid.innerHTML = '';
+            
+            products.forEach(product => {
+                const productCard = createProductCard(product);
+                
+                // Add to appropriate grid based on category
+                if (product.category === 'kit') {
+                    productGrid.appendChild(productCard);
+                } else if (product.category === 'skill') {
+                    skillGrid.appendChild(productCard);
+                } else if (product.category === 'health') {
+                    healthGrid.appendChild(productCard);
+                } else if (product.category === 'rank') {
+                    rankGrid.appendChild(productCard);
+                }
+            });
+        }
+
+        // Create product card
+        function createProductCard(product) {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.setAttribute('data-category', product.category);
+            
+            productCard.innerHTML = `
+                <div class="product-info">
+                    <h3 class="product-name">${product.name}</h3>
+                    <p class="product-description">${product.description}</p>
+                    <div class="product-pricing">
+                        <div class="product-price">RP ${product.price.toLocaleString('id-ID')}</div>
+                    </div>
+                    <div class="product-quantity">
+                        <button class="quantity-btn minus" data-id="${product.id}">-</button>
+                        <input type="text" class="quantity-input" value="1" readonly data-id="${product.id}">
+                        <button class="quantity-btn plus" data-id="${product.id}">+</button>
+                    </div>
+                    <button class="btn add-to-cart-btn" data-id="${product.id}">Tambah ke Keranjang</button>
+                </div>
+            `;
+            
+            // Add event listeners
+            const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
+            addToCartBtn.addEventListener('click', () => {
+                const productId = parseInt(addToCartBtn.getAttribute('data-id'));
+                const quantityInput = productCard.querySelector(`.quantity-input[data-id="${productId}"]`);
+                const quantity = parseInt(quantityInput.value);
+                addToCart(productId, quantity);
+            });
+            
+            const plusBtn = productCard.querySelector('.quantity-btn.plus');
+            plusBtn.addEventListener('click', () => {
+                const productId = plusBtn.getAttribute('data-id');
+                const quantityInput = productCard.querySelector(`.quantity-input[data-id="${productId}"]`);
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+            });
+            
+            const minusBtn = productCard.querySelector('.quantity-btn.minus');
+            minusBtn.addEventListener('click', () => {
+                const productId = minusBtn.getAttribute('data-id');
+                const quantityInput = productCard.querySelector(`.quantity-input[data-id="${productId}"]`);
+                if (parseInt(quantityInput.value) > 1) {
+                    quantityInput.value = parseInt(quantityInput.value) - 1;
+                }
+            });
+            
+            return productCard;
+        }
+
+        function handleSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const activeCategory = document.querySelector('.filter-tab.active').getAttribute('data-category');
+            
+            let filteredProducts = products;
+            
+            // Filter by search term
+            if (searchTerm) {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) || 
+                    product.description.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Filter by category
+            if (activeCategory !== 'all') {
+                filteredProducts = filteredProducts.filter(product => product.category === activeCategory);
+            }
+            
+            // Clear all grids
+            productGrid.innerHTML = '';
+            skillGrid.innerHTML = '';
+            healthGrid.innerHTML = '';
+            rankGrid.innerHTML = '';
+            
+            // Render filtered products
+            filteredProducts.forEach(product => {
+                const productCard = createProductCard(product);
+                
+                // Add to appropriate grid based on category
+                if (product.category === 'kit') {
+                    productGrid.appendChild(productCard);
+                } else if (product.category === 'skill') {
+                    skillGrid.appendChild(productCard);
+                } else if (product.category === 'health') {
+                    healthGrid.appendChild(productCard);
+                } else if (product.category === 'rank') {
+                    rankGrid.appendChild(productCard);
+                }
+            });
+        }
+
+        function filterProducts(category) {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            let filteredProducts = products;
+            
+            // Filter by search term
+            if (searchTerm) {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) || 
+                    product.description.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Filter by category
+            if (category !== 'all') {
+                filteredProducts = filteredProducts.filter(product => product.category === category);
+            }
+            
+            // Clear all grids
+            productGrid.innerHTML = '';
+            skillGrid.innerHTML = '';
+            healthGrid.innerHTML = '';
+            rankGrid.innerHTML = '';
+            
+            // Render filtered products
+            filteredProducts.forEach(product => {
+                const productCard = createProductCard(product);
+                
+                // Add to appropriate grid based on category
+                if (product.category === 'kit') {
+                    productGrid.appendChild(productCard);
+                } else if (product.category === 'skill') {
+                    skillGrid.appendChild(productCard);
+                } else if (product.category === 'health') {
+                    healthGrid.appendChild(productCard);
+                } else if (product.category === 'rank') {
+                    rankGrid.appendChild(productCard);
+                }
+            });
+        }
+
+        // Promo code functionality
+        async function applyPromoCode() {
+            const code = promoCodeInput.value.trim().toUpperCase();
+            
+            // Check if code matches format VG-XXXXXX
+            if (!/^VG-[A-Z0-9]{6}$/.test(code)) {
+                promoMessage.textContent = 'Format kode promo tidak valid! Format: VG-XXXXXX';
+                promoMessage.style.color = 'hsl(var(--destructive))';
+                return;
+            }
+
+            try {
+                const response = await fetch(API_ENDPOINTS.VALIDATE_PROMO, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code })
+                });
+
+                const data = await response.json();
+
+                if (data.valid) {
+                    appliedPromo = data.promo;
+                    promoMessage.innerHTML = `Kode promo ${code} berhasil diterapkan! (${appliedPromo.type === 'percentage' ? appliedPromo.value + '%' : 'RP ' + appliedPromo.value.toLocaleString('id-ID')}) <button class="remove-promo" id="removePromo">X</button>`;
+                    promoMessage.style.color = 'hsl(142 76% 36%)';
+                    
+                    document.getElementById('removePromo').addEventListener('click', removePromoCode);
+                    
+                    updateCart();
+                    saveToLocalStorage();
+                    showToast('Kode promo berhasil diterapkan', 'success');
+                } else {
+                    promoMessage.textContent = data.message || 'Kode promo tidak valid atau sudah kadaluarsa!';
+                    promoMessage.style.color = 'hsl(var(--destructive))';
+                    showToast('Kode promo tidak valid', 'error');
+                }
+            } catch (error) {
+                console.error('Error validating promo:', error);
+                promoMessage.textContent = 'Terjadi kesalahan saat validasi promo';
+                promoMessage.style.color = 'hsl(var(--destructive))';
+                showToast('Terjadi kesalahan saat validasi promo', 'error');
+            }
+        }
+
+        function removePromoCode() {
+            appliedPromo = null;
+            promoCodeInput.value = '';
+            promoMessage.textContent = '';
+            updateCart();
+            saveToLocalStorage();
+            showToast('Kode promo dihapus', 'info');
+        }
+
+        // Form validation
+        function validateForm() {
+            const usernameValid = usernameInput.value.length >= 3;
+            const agreementValid = agreementCheckbox.checked;
+            const cartValid = cart.length > 0;
+            
+            // Update username error message
+            if (usernameInput.value && usernameInput.value.length < 3) {
+                usernameError.textContent = 'Username minimal 3 karakter';
+            } else {
+                usernameError.textContent = '';
+            }
+            
+            // Enable/disable checkout button
+            checkoutBtn.disabled = !(usernameValid && agreementValid && cartValid);
+            
+            // Save form data
+            saveToLocalStorage();
+        }
+
+        // Checkout functionality
+        function checkout() {
+            if (checkoutCooldown) {
+                showToast('Tunggu 30 detik sebelum checkout lagi', 'error');
+                return;
+            }
+            
+            if (cart.length === 0) {
+                showToast('Keranjang Anda kosong', 'error');
+                return;
+            }
+            
+            if (usernameInput.value.length < 3) {
+                showToast('Username minimal 3 karakter', 'error');
+                return;
+            }
+            
+            if (!agreementCheckbox.checked) {
+                showToast('Anda harus menyetujui aturan pembelian', 'error');
+                return;
+            }
+            
+            let message = `*ORDER VANGUARD SHOP*\n\n`;
+            message += `*Username:* ${usernameInput.value}\n`;
+            message += `*Warna Username:* ${selectedColor}\n\n`;
+            message += `*=== PESANAN ===*\n`;
+            
+            let subtotal = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                message += `${item.quantity}x ${item.name} = RP ${itemTotal.toLocaleString('id-ID')}\n`;
+            });
+            
+            let discount = 0;
+            if (appliedPromo) {
+                if (appliedPromo.type === 'percentage') {
+                    discount = subtotal * (appliedPromo.value / 100);
+                } else {
+                    discount = appliedPromo.value;
+                }
+            }
+            
+            const total = subtotal - discount;
+            
+            message += `\n*Subtotal:* RP ${subtotal.toLocaleString('id-ID')}\n`;
+            if (appliedPromo) {
+                message += `*Diskon (${appliedPromo.code}):* -RP ${discount.toLocaleString('id-ID')}\n`;
+            }
+            message += `*TOTAL:* RP ${total.toLocaleString('id-ID')}\n\n`;
+            
+            if (notesInput.value) {
+                message += `*Catatan:* ${notesInput.value}\n\n`;
+            }
+            
+            message += `_Terima kasih telah berbelanja di Vanguard Shop!_`;
+            
+            // Buka WhatsApp dengan pesan yang sudah diformat
+            const phoneNumber = "6285929874084";
+            window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+            
+            // Set cooldown
+            checkoutCooldown = true;
+            checkoutBtn.disabled = true;
+            
+            let countdown = 30;
+            checkoutTimer.textContent = `Tunggu ${countdown} detik sebelum checkout lagi`;
+            
+            const timer = setInterval(() => {
+                countdown--;
+                checkoutTimer.textContent = `Tunggu ${countdown} detik sebelum checkout lagi`;
+                
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    checkoutCooldown = false;
+                    checkoutTimer.textContent = '';
+                    validateForm();
+                }
+            }, 1000);
+            
+            showToast('Pesanan berhasil dikirim via WhatsApp', 'success');
+        }
+
+        // Copy IP functionality
+        function copyIP() {
+            const ip = 'vgrdlgnz.my.id';
+            navigator.clipboard.writeText(ip).then(() => {
+                showToast('IP Server berhasil disalin!', 'success');
+            }).catch(err => {
+                showToast('Gagal menyalin IP Server', 'error');
+            });
+        }
+
+        // Toast notifications
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Admin functionality
+        function openLoginModal(e) {
+            e.preventDefault();
+            loginModal.style.display = 'flex';
+        }
+
+        function closeLoginModal() {
+            loginModal.style.display = 'none';
+        }
+
+        function closeAdminPanel() {
+            adminPanel.style.display = 'none';
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            try {
+                const response = await fetch(API_ENDPOINTS.LOGIN, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    adminToken = data.token;
+                    localStorage.setItem('vanguardAdminToken', adminToken);
+                    loginModal.style.display = 'none';
+                    adminPanel.style.display = 'flex';
+                    showToast('Login admin berhasil', 'success');
+                    await renderPromoList();
+                } else {
+                    showToast(data.message || 'Login gagal', 'error');
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+                showToast('Terjadi kesalahan saat login', 'error');
+            }
+        }
+
+        async function handleAdminLogout() {
+            try {
+                await fetch(API_ENDPOINTS.LOGOUT, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    }
+                });
+            } catch (error) {
+                console.error('Error during logout:', error);
+            }
+            
+            adminToken = null;
+            localStorage.removeItem('vanguardAdminToken');
+            adminPanel.style.display = 'none';
+            showToast('Logout berhasil', 'success');
+        }
+
+        async function generatePromoCode() {
+            const type = discountType.value;
+            const value = parseInt(discountValue.value);
+            
+            if (!value || value <= 0) {
+                showToast('Masukkan nilai diskon yang valid', 'error');
+                return;
+            }
+
+            if (!adminToken) {
+                showToast('Silakan login kembali', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_ENDPOINTS.GENERATE_PROMO, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminToken}`
+                    },
+                    body: JSON.stringify({ type, value })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update UI
+                    promoCodeOutput.textContent = data.code;
+                    promoDetails.textContent = `Tipe: ${type === 'percentage' ? 'Percentage' : 'Fixed Amount'} | Nilai: ${type === 'percentage' ? value + '%' : 'RP ' + value.toLocaleString('id-ID')}`;
+                    promoOutput.style.display = 'flex';
+                    
+                    // Update promo list
+                    await renderPromoList();
+                    
+                    showToast('Kode promo berhasil dibuat', 'success');
+                } else {
+                    showToast(data.message || 'Gagal generate promo', 'error');
+                }
+            } catch (error) {
+                console.error('Error generating promo:', error);
+                showToast('Terjadi kesalahan saat generate promo', 'error');
+            }
+        }
+
+        function copyPromoCode() {
+            const code = promoCodeOutput.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('Kode promo berhasil disalin!', 'success');
+            }).catch(err => {
+                showToast('Gagal menyalin kode promo', 'error');
+            });
+        }
+
+        async function renderPromoList() {
+            if (!adminToken) {
+                showToast('Silakan login kembali', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_ENDPOINTS.GET_PROMOS, {
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    activePromos = data.promos;
+                    promoList.innerHTML = '';
+                    activePromos.forEach(promo => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${promo.code}</td>
+                            <td>${promo.type === 'percentage' ? 'Percentage' : 'Fixed Amount'}</td>
+                            <td>${promo.type === 'percentage' ? promo.value + '%' : 'RP ' + promo.value.toLocaleString('id-ID')}</td>
+                            <td>${promo.status}</td>
+                        `;
+                        promoList.appendChild(row);
+                    });
+                } else {
+                    showToast(data.message || 'Gagal mengambil daftar promo', 'error');
+                }
+            } catch (error) {
+                console.error('Error fetching promos:', error);
+                showToast('Terjadi kesalahan saat mengambil daftar promo', 'error');
+            }
+        }
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>
