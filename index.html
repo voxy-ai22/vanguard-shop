@@ -1521,6 +1521,7 @@
                         <option value="fixed">Fixed Amount</option>
                     </select>
                     <input type="number" id="discountValue" placeholder="Nilai diskon" min="1">
+                    <input type="date" id="expiryDate" class="form-control">
                     <button class="btn" id="generatePromoBtn">Generate Promo Code</button>
                 </div>
                 
@@ -1542,6 +1543,7 @@
                             <th>Kode</th>
                             <th>Tipe</th>
                             <th>Nilai</th>
+                            <th>Expires</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -1625,26 +1627,37 @@
         const generatePromoBtn = document.getElementById('generatePromoBtn');
         const discountType = document.getElementById('discountType');
         const discountValue = document.getElementById('discountValue');
+        const expiryDate = document.getElementById('expiryDate');
         const promoOutput = document.getElementById('promoOutput');
         const promoCodeOutput = document.getElementById('promoCodeOutput');
         const promoDetails = document.getElementById('promoDetails');
         const copyPromoBtn = document.getElementById('copyPromoBtn');
         const promoList = document.getElementById('promoList');
 
-        // Backend API URLs - Menggunakan path relatif
+        // Backend API URLs - PERBAIKAN: Menghapus ekstensi .js
         const API_BASE = '/api';
         const API_ENDPOINTS = {
-            LOGIN: `${API_BASE}/admin/login.js`,
-            LOGOUT: `${API_BASE}/admin/logout.js`,
-            GENERATE_PROMO: `${API_BASE}/admin/generate-promo.js`,
-            GET_PROMOS: `${API_BASE}/admin/promos.js`,
-            VALIDATE_PROMO: `${API_BASE}/validate-promo.js`
+            LOGIN: `${API_BASE}/admin/login`,
+            GENERATE_PROMO: `${API_BASE}/admin/generate-promo`,
+            GET_PROMOS: `${API_BASE}/admin/promos`,
+            VALIDATE_PROMO: `${API_BASE}/validate-promo`
         };
 
         // Initialize the application
         function init() {
             // Load saved data from localStorage
             loadFromLocalStorage();
+            
+            // Set minimum date untuk expiry date (hari ini)
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            expiryDate.min = tomorrow.toISOString().split('T')[0];
+            
+            // Set default expiry date (30 hari dari sekarang)
+            const defaultExpiry = new Date(today);
+            defaultExpiry.setDate(defaultExpiry.getDate() + 30);
+            expiryDate.value = defaultExpiry.toISOString().split('T')[0];
             
             // Render products
             renderProductsByCategory();
@@ -2084,13 +2097,12 @@
             });
         }
 
-        // Promo code functionality
+        // Promo code functionality - PERBAIKAN: Response handling sesuai backend
         async function applyPromoCode() {
             const code = promoCodeInput.value.trim().toUpperCase();
             
-            // Check if code matches format VG-XXXXXX
-            if (!/^VG-[A-Z0-9]{6}$/.test(code)) {
-                promoMessage.textContent = 'Format kode promo tidak valid! Format: VG-XXXXXX';
+            if (!code) {
+                promoMessage.textContent = 'Masukkan kode promo!';
                 promoMessage.style.color = 'hsl(var(--destructive))';
                 return;
             }
@@ -2101,13 +2113,22 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ code })
+                    body: JSON.stringify({ 
+                        code: code,
+                        username: usernameInput.value || 'Unknown'
+                    })
                 });
 
                 const data = await response.json();
 
-                if (data.valid) {
-                    appliedPromo = data.promo;
+                if (data.success) {
+                    appliedPromo = {
+                        code: code,
+                        type: data.type || 'percentage',
+                        value: data.value || 10,
+                        discount: data.discount || '10%'
+                    };
+                    
                     promoMessage.innerHTML = `Kode promo ${code} berhasil diterapkan! (${appliedPromo.type === 'percentage' ? appliedPromo.value + '%' : 'RP ' + appliedPromo.value.toLocaleString('id-ID')}) <button class="remove-promo" id="removePromo">X</button>`;
                     promoMessage.style.color = 'hsl(142 76% 36%)';
                     
@@ -2117,9 +2138,9 @@
                     saveToLocalStorage();
                     showToast('Kode promo berhasil diterapkan', 'success');
                 } else {
-                    promoMessage.textContent = data.message || 'Kode promo tidak valid atau sudah kadaluarsa!';
+                    promoMessage.textContent = data.message || 'Kode promo tidak valid!';
                     promoMessage.style.color = 'hsl(var(--destructive))';
-                    showToast('Kode promo tidak valid', 'error');
+                    showToast(data.message || 'Kode promo tidak valid', 'error');
                 }
             } catch (error) {
                 console.error('Error validating promo:', error);
@@ -2264,7 +2285,7 @@
             }, 3000);
         }
 
-        // Admin functionality
+        // Admin functionality - PERBAIKAN: API calls sesuai dengan backend
         function openLoginModal(e) {
             e.preventDefault();
             loginModal.style.display = 'flex';
@@ -2310,30 +2331,26 @@
             }
         }
 
-        async function handleAdminLogout() {
-            try {
-                await fetch(API_ENDPOINTS.LOGOUT, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${adminToken}`
-                    }
-                });
-            } catch (error) {
-                console.error('Error during logout:', error);
-            }
-            
+        function handleAdminLogout() {
             adminToken = null;
             localStorage.removeItem('vanguardAdminToken');
             adminPanel.style.display = 'none';
             showToast('Logout berhasil', 'success');
         }
 
+        // PERBAIKAN: Generate promo dengan expiry date
         async function generatePromoCode() {
             const type = discountType.value;
             const value = parseInt(discountValue.value);
+            const expiry = expiryDate.value;
             
             if (!value || value <= 0) {
                 showToast('Masukkan nilai diskon yang valid', 'error');
+                return;
+            }
+
+            if (!expiry) {
+                showToast('Pilih tanggal kedaluwarsa', 'error');
                 return;
             }
 
@@ -2346,24 +2363,42 @@
                 const response = await fetch(API_ENDPOINTS.GENERATE_PROMO, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${adminToken}`
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ type, value })
+                    body: JSON.stringify({ 
+                        token: adminToken,
+                        discount: value,
+                        type: type,
+                        expiryDate: expiry
+                    })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    // Update UI
-                    promoCodeOutput.textContent = data.code;
-                    promoDetails.textContent = `Tipe: ${type === 'percentage' ? 'Percentage' : 'Fixed Amount'} | Nilai: ${type === 'percentage' ? value + '%' : 'RP ' + value.toLocaleString('id-ID')}`;
+                    // Update UI dengan info expiry
+                    promoCodeOutput.textContent = data.promo.code;
+                    
+                    // Format tanggal untuk tampilan
+                    const expiryDateObj = new Date(data.promo.expiresAt);
+                    const formattedDate = expiryDateObj.toLocaleDateString('id-ID', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    promoDetails.innerHTML = `
+                        <div>Tipe: ${type === 'percentage' ? 'Percentage' : 'Fixed Amount'}</div>
+                        <div>Nilai: ${type === 'percentage' ? value + '%' : 'RP ' + value.toLocaleString('id-ID')}</div>
+                        <div>Berlaku sampai: ${formattedDate}</div>
+                    `;
                     promoOutput.style.display = 'flex';
                     
                     // Update promo list
                     await renderPromoList();
                     
-                    showToast('Kode promo berhasil dibuat', 'success');
+                    showToast(`Promo berhasil dibuat! Berlaku sampai ${formattedDate}`, 'success');
                 } else {
                     showToast(data.message || 'Gagal generate promo', 'error');
                 }
@@ -2382,6 +2417,7 @@
             });
         }
 
+        // PERBAIKAN: Get promos dengan expiry date
         async function renderPromoList() {
             if (!adminToken) {
                 showToast('Silakan login kembali', 'error');
@@ -2390,26 +2426,65 @@
 
             try {
                 const response = await fetch(API_ENDPOINTS.GET_PROMOS, {
+                    method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${adminToken}`
-                    }
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token: adminToken })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    activePromos = data.promos;
+                    activePromos = data.promos || [];
                     promoList.innerHTML = '';
-                    activePromos.forEach(promo => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${promo.code}</td>
-                            <td>${promo.type === 'percentage' ? 'Percentage' : 'Fixed Amount'}</td>
-                            <td>${promo.type === 'percentage' ? promo.value + '%' : 'RP ' + promo.value.toLocaleString('id-ID')}</td>
-                            <td>${promo.status}</td>
-                        `;
-                        promoList.appendChild(row);
-                    });
+                    
+                    if (activePromos.length === 0) {
+                        promoList.innerHTML = '<tr><td colspan="5" style="text-align: center;">Tidak ada kode promo aktif</td></tr>';
+                    } else {
+                        activePromos.forEach(promo => {
+                            const row = document.createElement('tr');
+                            
+                            // Format tanggal expiry
+                            const expiryDate = new Date(promo.expiresAt);
+                            const formattedDate = expiryDate.toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                            });
+                            
+                            // Hitung sisa hari
+                            const now = new Date();
+                            const timeDiff = expiryDate - now;
+                            const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                            
+                            let statusText = promo.status;
+                            let statusClass = '';
+                            
+                            if (promo.status === 'used') {
+                                statusClass = 'status-used';
+                                statusText = `Used by ${promo.usedBy || 'Unknown'}`;
+                            } else if (daysRemaining <= 0) {
+                                statusClass = 'status-expired';
+                                statusText = 'Expired';
+                            } else if (daysRemaining <= 7) {
+                                statusClass = 'status-warning';
+                                statusText = `${daysRemaining} hari lagi`;
+                            } else {
+                                statusClass = 'status-active';
+                                statusText = `${daysRemaining} hari lagi`;
+                            }
+                            
+                            row.innerHTML = `
+                                <td>${promo.code}</td>
+                                <td>${promo.type === 'percentage' ? 'Percentage' : 'Fixed'}</td>
+                                <td>${promo.value}</td>
+                                <td>${formattedDate}</td>
+                                <td class="${statusClass}">${statusText}</td>
+                            `;
+                            promoList.appendChild(row);
+                        });
+                    }
                 } else {
                     showToast(data.message || 'Gagal mengambil daftar promo', 'error');
                 }
