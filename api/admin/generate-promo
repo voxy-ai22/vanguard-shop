@@ -1,40 +1,136 @@
 import jwt from "jsonwebtoken";
 import { addPromo } from "../../utils/db.js";
 
+/**
+ * API: Generate Promo Code
+ * POST /api/admin/generate-promo
+ * 
+ * Headers:
+ * Authorization: Bearer <token>
+ * 
+ * Body:
+ * {
+ *   "discountType": "percentage",  // atau "fixed"
+ *   "discountValue": 20,            // 20% atau nilai nominal
+ *   "maxUses": 5,                   // Berapa kali bisa dipakai (default: 1)
+ *   "expiresAt": 1732000000000      // Timestamp expire (optional)
+ * }
+ * 
+ * Response:
+ * {
+ *   "success": true,
+ *   "message": "Promo generated successfully!",
+ *   "promo": {
+ *     "code": "PROMO-A1B2C3D4",
+ *     "discount": "20%",
+ *     "maxUses": 5,
+ *     "expiresAt": 1732000000000
+ *   }
+ * }
+ */
 export default function handler(req, res) {
+  // Validasi method
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, message: "Method not allowed" });
-  }
-
-  const { token, discount, type = "percentage" } = req.body || {};
-
-  if (!token) {
-    return res.status(401).json({ success: false, message: "Token required" });
-  }
-
-  // Cek token admin
-  try {
-    jwt.verify(token, process.env.JWT_SECRET);
-  } catch (err) {
-    return res.status(401).json({ success: false, message: "Invalid or expired token" });
-  }
-
-  // Validasi discount
-  if (!discount || isNaN(discount) || discount < 1) {
-    return res.status(400).json({
-      success: false,
-      message: "Valid discount amount is required"
+    return res.status(405).json({ 
+      success: false, 
+      message: "Method not allowed" 
     });
   }
 
-  // Generate kode promo yang lebih unik
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 8);
-  const code = `VG-${timestamp}-${random}`.toUpperCase();
-
-  // Tambahkan promo ke database
   try {
-    const result = addPromo(code, parseInt(discount), type);
+    // Get token dari header atau body
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace("Bearer ", "") || req.body?.token;
+
+    // Validasi token ada
+    if (!token) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Token tidak ditemukan" 
+      });
+    }
+
+    // Verify token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key-change-this");
+      
+      // Pastikan admin
+      if (!decoded.admin) {
+        return res.status(403).json({ 
+          success: false, 
+          message: "User bukan admin" 
+        });
+      }
+    } catch (error) {
+      return res.status(401).json({ 
+        success: false, 
+        message: "Token tidak valid atau expired" 
+      });
+    }
+
+    // Destructure request body
+    const { discountType, discountValue, maxUses, expiresAt } = req.body || {};
+
+    // Validasi required fields
+    if (!discountType || discountValue === undefined) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Tipe diskon dan nilai wajib diisi" 
+      });
+    }
+
+    // Validasi discount type
+    if (!["percentage", "fixed"].includes(discountType)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Tipe diskon harus 'percentage' atau 'fixed'" 
+      });
+    }
+
+    // Validasi discount value
+    if (typeof discountValue !== "number" || discountValue < 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Nilai diskon harus angka positif" 
+      });
+    }
+
+    // Validasi percentage range
+    if (discountType === "percentage" && discountValue > 100) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Diskon persentase tidak boleh lebih dari 100%" 
+      });
+    }
+
+    // Validasi maxUses
+    const finalMaxUses = maxUses || 1;
+    if (typeof finalMaxUses !== "number" || finalMaxUses < 1) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Max uses minimal 1" 
+      });
+    }
+
+    // Validasi expiresAt
+    if (expiresAt && (typeof expiresAt !== "number" || expiresAt < Date.now())) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Tanggal expire harus di masa depan" 
+      });
+    }
+
+    // Generate promo code
+    const code = "PROMO-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    // Format discount string
+    const discountStr = discountType === "percentage" 
+      ? `${discountValue}%` 
+      : `IDR ${discountValue}`;
+
+    // Tambahkan ke database
+    const result = addPromo(code, discountStr, finalMaxUses, expiresAt);
 
     if (!result.success) {
       return res.status(400).json({
@@ -46,13 +142,23 @@ export default function handler(req, res) {
     return res.status(200).json({
       success: true,
       message: "Promo generated successfully!",
-      promo: result.promo
+      promo: {
+        code,
+        discount: discountStr,
+        discountType,
+        discountValue,
+        maxUses: finalMaxUses,
+        expiresAt: expiresAt || null,
+        createdBy: decoded.username,
+        createdAt: new Date().toISOString()
+      }
     });
+
   } catch (error) {
-    console.error("Error generating promo:", error);
+    console.error("[GENERATE PROMO ERROR]", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error"
+      message: "Terjadi kesalahan server"
     });
   }
 }
