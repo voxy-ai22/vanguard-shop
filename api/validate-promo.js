@@ -5,17 +5,7 @@ export default function handler(req, res) {
     return res.status(405).json({ success: false, message: "Method not allowed" });
   }
 
-  const { token, code, username } = req.body || {};
-
-  // Verifikasi token (opsional untuk validate promo, bisa dihapus jika ingin publik)
-  if (token) {
-    try {
-      const jwt = require('jsonwebtoken');
-      jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
-      return res.status(401).json({ success: false, message: "Invalid token" });
-    }
-  }
+  const { code, username } = req.body || {};
 
   // Validasi kode promo
   if (!code) {
