@@ -1,51 +1,45 @@
-let promoList = [];
+import fs from "fs";
+import path from "path";
 
-/**
- * Tambah promo baru
- */
-export function addPromo(code, discount) {
-  const exists = promoList.some(p => p.code === code);
-  if (exists) {
-    return { success: false, message: "Kode promo sudah ada!" };
-  }
+const filePath = path.join(process.cwd(), "data", "promo.json");
 
-  promoList.push({
+export function addPromo(code, type, value) {
+  let promos = readPromos();
+
+  const exists = promos.some(p => p.code === code);
+  if (exists) return { success: false, message: "Promo already exists" };
+
+  promos.push({
     code,
-    discount,
+    type,
+    value,
     used: false,
     createdAt: new Date().toISOString()
   });
 
-  return { success: true, message: "Promo berhasil dibuat!" };
+  fs.writeFileSync(filePath, JSON.stringify(promos, null, 2));
+
+  return { success: true };
 }
 
-/**
- * Ambil semua promo
- */
 export function getPromos() {
-  return promoList;
+  return readPromos();
 }
 
-/**
- * Validasi promo
- */
 export function validatePromo(code) {
-  const promo = promoList.find(p => p.code === code);
+  let promos = readPromos();
+  const promo = promos.find(p => p.code === code);
 
-  if (!promo) {
-    return { success: false, message: "Kode promo tidak ditemukan!" };
-  }
+  if (!promo) return { success: false, message: "Promo not found" };
+  if (promo.used) return { success: false, message: "Promo already used" };
 
-  if (promo.used) {
-    return { success: false, message: "Kode promo sudah digunakan!" };
-  }
-
-  // Tandai promonya digunakan
   promo.used = true;
+  fs.writeFileSync(filePath, JSON.stringify(promos, null, 2));
 
-  return {
-    success: true,
-    discount: promo.discount,
-    message: "Promo valid!"
-  };
+  return { success: true, discount: promo.value };
+}
+
+function readPromos() {
+  if (!fs.existsSync(filePath)) return [];
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
