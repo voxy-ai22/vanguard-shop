@@ -1,21 +1,14 @@
 import jwt from "jsonwebtoken";
 
 export default function handler(req, res) {
-  if (req.method !== "POST")
-    return res.status(405).json({ error: "Method not allowed" });
-
-  const { username, password } = req.body || {};
-
-  if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
-
-    const token = jwt.sign(
-      { admin: true, username },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    return res.status(200).json({ success: true, token });
+  if (req.method !== "POST") {
+    return res.status(405).json({ success: false, message: "Method not allowed" });
   }
 
-  return res.status(401).json({ success: false, message: "Invalid credentials" });
+  // Untuk logout, kita hanya perlu menghapus token dari client side
+  // Backend tidak menyimpan state login, jadi cukup return success
+  return res.status(200).json({ 
+    success: true, 
+    message: "Logout successful" 
+  });
 }
