@@ -35,7 +35,7 @@ export function addPromo(code, discount, type = "percentage", expiryDate) {
     code,
     discount: type === "percentage" ? `${discount}%` : `Rp${discount}`,
     type: type,
-    value: discount,
+    value: parseInt(discount),
     status: "active",
     used: false,
     usedBy: null,
