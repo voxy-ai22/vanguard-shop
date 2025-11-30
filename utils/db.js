@@ -1,45 +1,101 @@
-import fs from "fs";
-import path from "path";
+let promoList = [];
 
-const filePath = path.join(process.cwd(), "data", "promo.json");
+/**
+ * Tambah promo baru
+ */
+export function addPromo(code, discount, type = "percentage") {
+  // Validasi input
+  if (!code || !discount) {
+    return { success: false, message: "Code and discount are required!" };
+  }
 
-export function addPromo(code, type, value) {
-  let promos = readPromos();
+  const exists = promoList.some(p => p.code === code);
+  if (exists) {
+    return { success: false, message: "Promo code already exists!" };
+  }
 
-  const exists = promos.some(p => p.code === code);
-  if (exists) return { success: false, message: "Promo already exists" };
+  // Validasi tipe discount
+  if (type === "percentage" && (discount < 1 || discount > 100)) {
+    return { success: false, message: "Percentage discount must be between 1-100!" };
+  }
 
-  promos.push({
+  if (type === "fixed" && discount < 1) {
+    return { success: false, message: "Fixed discount must be greater than 0!" };
+  }
+
+  const newPromo = {
     code,
-    type,
-    value,
+    discount: type === "percentage" ? `${discount}%` : `Rp${discount}`,
+    type: type,
+    value: discount,
+    status: "active",
     used: false,
-    createdAt: new Date().toISOString()
-  });
+    createdAt: new Date().toISOString(),
+    usedAt: null
+  };
 
-  fs.writeFileSync(filePath, JSON.stringify(promos, null, 2));
-
-  return { success: true };
+  promoList.push(newPromo);
+  return { success: true, message: "Promo created successfully!", promo: newPromo };
 }
 
+/**
+ * Ambil semua promo
+ */
 export function getPromos() {
-  return readPromos();
+  return promoList.map(promo => ({
+    code: promo.code,
+    type: promo.type,
+    value: promo.discount,
+    status: promo.used ? "used" : "active",
+    createdAt: promo.createdAt
+  }));
 }
 
+/**
+ * Validasi promo
+ */
 export function validatePromo(code) {
-  let promos = readPromos();
-  const promo = promos.find(p => p.code === code);
+  if (!code) {
+    return { success: false, message: "Promo code is required!" };
+  }
 
-  if (!promo) return { success: false, message: "Promo not found" };
-  if (promo.used) return { success: false, message: "Promo already used" };
+  const promo = promoList.find(p => p.code === code.toUpperCase());
 
+  if (!promo) {
+    return { success: false, message: "Promo code not found!" };
+  }
+
+  if (promo.used) {
+    return { success: false, message: "Promo code already used!" };
+  }
+
+  if (promo.status !== "active") {
+    return { success: false, message: "Promo code is not active!" };
+  }
+
+  // Tandai sebagai digunakan
   promo.used = true;
-  fs.writeFileSync(filePath, JSON.stringify(promos, null, 2));
+  promo.usedAt = new Date().toISOString();
+  promo.status = "used";
 
-  return { success: true, discount: promo.value };
+  return {
+    success: true,
+    discount: promo.discount,
+    type: promo.type,
+    value: promo.value,
+    message: "Promo applied successfully!"
+  };
 }
 
-function readPromos() {
-  if (!fs.existsSync(filePath)) return [];
-  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+/**
+ * Hapus promo (opsional)
+ */
+export function deletePromo(code) {
+  const index = promoList.findIndex(p => p.code === code);
+  if (index === -1) {
+    return { success: false, message: "Promo code not found!" };
+  }
+  
+  promoList.splice(index, 1);
+  return { success: true, message: "Promo deleted successfully!" };
 }
