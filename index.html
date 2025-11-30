@@ -1121,6 +1121,27 @@
         .modal-close:hover {
             background-color: hsl(var(--secondary));
         }
+
+        /* Status Styles */
+        .status-active {
+            color: hsl(142 76% 36%);
+            font-weight: 600;
+        }
+
+        .status-used {
+            color: hsl(var(--destructive));
+            font-weight: 600;
+        }
+
+        .status-expired {
+            color: hsl(var(--muted-foreground));
+            font-weight: 600;
+        }
+
+        .status-warning {
+            color: hsl(38 92% 50%);
+            font-weight: 600;
+        }
         
         /* Animations */
         @keyframes fadeInUp {
@@ -2399,6 +2420,9 @@
                     await renderPromoList();
                     
                     showToast(`Promo berhasil dibuat! Berlaku sampai ${formattedDate}`, 'success');
+                    
+                    // Reset form
+                    discountValue.value = '';
                 } else {
                     showToast(data.message || 'Gagal generate promo', 'error');
                 }
@@ -2440,7 +2464,7 @@
                     promoList.innerHTML = '';
                     
                     if (activePromos.length === 0) {
-                        promoList.innerHTML = '<tr><td colspan="5" style="text-align: center;">Tidak ada kode promo aktif</td></tr>';
+                        promoList.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: hsl(var(--muted-foreground));">Tidak ada kode promo aktif</td></tr>';
                     } else {
                         activePromos.forEach(promo => {
                             const row = document.createElement('tr');
