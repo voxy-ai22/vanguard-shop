@@ -1,209 +1,139 @@
-/**
- * Database utility untuk manage promo codes
- * Dengan support: expiry date, usage limit, dan validation
- */
-
 let promoList = [];
 
 /**
- * Tambah promo baru dengan fitur lengkap
- * @param {string} code - Kode promo (e.g., PROMO-ABC123)
- * @param {string} discount - Diskon (e.g., "20%" atau "50000")
- * @param {number} maxUses - Berapa kali bisa dipakai (default: 1)
- * @param {number} expiresAt - Timestamp kapan promo expire (optional)
+ * Tambah promo baru dengan expiry date
  */
-export function addPromo(code, discount, maxUses = 1, expiresAt = null) {
-  // Validasi: promo sudah ada?
+export function addPromo(code, discount, type = "percentage", expiryDate) {
+  // Validasi input
+  if (!code || !discount) {
+    return { success: false, message: "Code and discount are required!" };
+  }
+
   const exists = promoList.some(p => p.code === code);
   if (exists) {
-    return { success: false, message: "Kode promo sudah ada!" };
+    return { success: false, message: "Promo code already exists!" };
   }
 
-  // Validasi: discount format
-  if (!discount || typeof discount !== "string") {
-    return { success: false, message: "Format diskon tidak valid!" };
+  // Validasi tipe discount
+  if (type === "percentage" && (discount < 1 || discount > 100)) {
+    return { success: false, message: "Percentage discount must be between 1-100!" };
   }
 
-  // Validasi: maxUses
-  if (maxUses < 1) {
-    return { success: false, message: "Max uses minimal 1!" };
+  if (type === "fixed" && discount < 1) {
+    return { success: false, message: "Fixed discount must be greater than 0!" };
   }
 
-  // Validasi: expiresAt harus di masa depan jika ada
-  if (expiresAt && expiresAt < Date.now()) {
-    return { success: false, message: "Tanggal expire harus di masa depan!" };
+  // Validasi expiry date
+  const now = new Date();
+  const expiresAt = new Date(expiryDate);
+  
+  if (expiresAt <= now) {
+    return { success: false, message: "Expiry date must be in the future!" };
   }
 
-  promoList.push({
+  const newPromo = {
     code,
-    discount,
-    maxUses,
-    timesUsed: 0,
-    expiresAt,
-    active: true,
-    createdAt: new Date().toISOString()
-  });
+    discount: type === "percentage" ? `${discount}%` : `Rp${discount}`,
+    type: type,
+    value: discount,
+    status: "active",
+    used: false,
+    usedBy: null,
+    usedAt: null,
+    createdAt: now.toISOString(),
+    expiresAt: expiresAt.toISOString()
+  };
 
+  promoList.push(newPromo);
   return { 
     success: true, 
-    message: "Promo berhasil dibuat!",
-    promo: { code, discount, maxUses, expiresAt }
+    message: "Promo created successfully!", 
+    promo: newPromo 
   };
 }
 
 /**
- * Ambil semua promo yang aktif
+ * Ambil semua promo dengan status expiry
  */
 export function getPromos() {
-  return promoList.map(promo => ({
-    code: promo.code,
-    discount: promo.discount,
-    maxUses: promo.maxUses,
-    timesUsed: promo.timesUsed,
-    expiresAt: promo.expiresAt,
-    isExpired: promo.expiresAt ? Date.now() > promo.expiresAt : false,
-    isExhausted: promo.timesUsed >= promo.maxUses,
-    active: promo.active,
-    createdAt: promo.createdAt
-  }));
+  const now = new Date();
+  
+  return promoList.map(promo => {
+    const isExpired = new Date(promo.expiresAt) < now;
+    const status = promo.used ? "used" : isExpired ? "expired" : "active";
+    
+    return {
+      code: promo.code,
+      type: promo.type,
+      value: promo.discount,
+      status: status,
+      createdAt: promo.createdAt,
+      expiresAt: promo.expiresAt,
+      usedBy: promo.usedBy,
+      usedAt: promo.usedAt
+    };
+  });
 }
 
 /**
- * Ambil promo detail by code
+ * Validasi promo dengan cek expiry dan single use
  */
-export function getPromoByCode(code) {
-  return promoList.find(p => p.code === code);
-}
+export function validatePromo(code, username = null) {
+  if (!code) {
+    return { success: false, message: "Promo code is required!" };
+  }
 
-/**
- * Validasi promo sebelum digunakan
- */
-export function validatePromo(code) {
-  const promo = promoList.find(p => p.code === code);
+  const promo = promoList.find(p => p.code === code.toUpperCase());
+  const now = new Date();
 
-  // Promo tidak ditemukan
   if (!promo) {
-    return { success: false, message: "Kode promo tidak ditemukan!" };
+    return { success: false, message: "Promo code not found!" };
   }
 
-  // Promo tidak aktif
-  if (!promo.active) {
-    return { success: false, message: "Kode promo tidak aktif!" };
+  // Cek apakah sudah digunakan
+  if (promo.used) {
+    return { 
+      success: false, 
+      message: `Promo code already used by ${promo.usedBy || 'another user'}!` 
+    };
   }
 
-  // Cek expiry date
-  if (promo.expiresAt && Date.now() > promo.expiresAt) {
-    promo.active = false;
-    return { success: false, message: "Kode promo sudah expired!" };
+  // Cek apakah sudah expired
+  if (new Date(promo.expiresAt) < now) {
+    return { 
+      success: false, 
+      message: "Promo code has expired!" 
+    };
   }
 
-  // Cek usage limit
-  if (promo.timesUsed >= promo.maxUses) {
-    promo.active = false;
-    return { success: false, message: "Kode promo sudah habis digunakan!" };
+  if (promo.status !== "active") {
+    return { success: false, message: "Promo code is not active!" };
   }
+
+  // Tandai sebagai digunakan
+  promo.used = true;
+  promo.usedBy = username || "Unknown";
+  promo.usedAt = new Date().toISOString();
+  promo.status = "used";
 
   return {
     success: true,
     discount: promo.discount,
-    timesUsed: promo.timesUsed,
-    maxUses: promo.maxUses,
-    message: "Promo valid!"
+    type: promo.type,
+    value: promo.value,
+    message: "Promo applied successfully!"
   };
 }
 
 /**
- * Gunakan promo code (increment usage)
- */
-export function usePromo(code) {
-  const validation = validatePromo(code);
-
-  if (!validation.success) {
-    return validation;
-  }
-
-  const promo = promoList.find(p => p.code === code);
-  
-  // Increment usage
-  promo.timesUsed += 1;
-
-  // Auto disable jika habis
-  if (promo.timesUsed >= promo.maxUses) {
-    promo.active = false;
-  }
-
-  return {
-    success: true,
-    discount: promo.discount,
-    timesUsed: promo.timesUsed,
-    maxUses: promo.maxUses,
-    message: "Promo berhasil digunakan!"
-  };
-}
-
-/**
- * Deactivate promo manual
- */
-export function deactivatePromo(code) {
-  const promo = promoList.find(p => p.code === code);
-  
-  if (!promo) {
-    return { success: false, message: "Promo tidak ditemukan!" };
-  }
-
-  promo.active = false;
-  return { success: true, message: "Promo berhasil dinonaktifkan!" };
-}
-
-/**
- * Edit promo
- */
-export function editPromo(code, updates) {
-  const promo = promoList.find(p => p.code === code);
-
-  if (!promo) {
-    return { success: false, message: "Promo tidak ditemukan!" };
-  }
-
-  // Update fields yang diizinkan
-  if (updates.maxUses !== undefined && updates.maxUses < 1) {
-    return { success: false, message: "Max uses minimal 1!" };
-  }
-
-  if (updates.expiresAt !== undefined && updates.expiresAt < Date.now()) {
-    return { success: false, message: "Tanggal expire harus di masa depan!" };
-  }
-
-  if (updates.discount) promo.discount = updates.discount;
-  if (updates.maxUses) promo.maxUses = updates.maxUses;
-  if (updates.expiresAt) promo.expiresAt = updates.expiresAt;
-  if (updates.active !== undefined) promo.active = updates.active;
-
-  return { 
-    success: true, 
-    message: "Promo berhasil diupdate!",
-    promo
-  };
-}
-
-/**
- * Delete promo
+ * Hapus promo
  */
 export function deletePromo(code) {
   const index = promoList.findIndex(p => p.code === code);
-
   if (index === -1) {
-    return { success: false, message: "Promo tidak ditemukan!" };
+    return { success: false, message: "Promo code not found!" };
   }
-
+  
   promoList.splice(index, 1);
-  return { success: true, message: "Promo berhasil dihapus!" };
-}
-
-/**
- * Clear all promos (untuk testing)
- */
-export function clearAllPromos() {
-  promoList = [];
-  return { success: true, message: "Semua promo dihapus!" };
+  return { success: true, message: "Promo deleted successfully!" };
 }
